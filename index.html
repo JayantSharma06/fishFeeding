@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Motor Control</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        button { font-size: 1.2em; padding: 10px 20px; margin: 10px; }
+        #speedControl { margin: 20px; }
+    </style>
+</head>
+<body>
+
+    <h2>ESP32 Motor Control</h2>
+
+    <button onclick="controlMotor('start')">Start Motor</button>
+    <button onclick="controlMotor('stop')">Stop Motor</button>
+
+    <div id="speedControl">
+        <label for="speed">Motor Speed:</label>
+        <input type="range" id="speed" min="0" max="255" value="128" oninput="updateSpeed(this.value)">
+        <span id="speedValue">128</span>
+    </div>
+
+    <script>
+        // Replace with the actual IP address of your ESP32
+        const ESP32_IP = 'http://192.168.116.35';
+        // Function to send API request to ESP32 for start/stop control
+        async function controlMotor(action) {
+            try {
+                const endpoint = `${ESP32_IP}/${action}`;
+                const response = await fetch(endpoint);
+                
+                if (response.ok) {
+                    alert(`Motor ${action === 'start' ? 'Started' : 'Stopped'}`);
+                } else {
+                    alert(`Failed to ${action} motor`);
+                }
+            } catch (error) {
+                alert('Error connecting to ESP32');
+                console.error(error);
+            }
+        }
+
+        // Function to update motor speed
+        async function updateSpeed(speed) {
+            try {
+                document.getElementById('speedValue').innerText = speed;
+                
+                // Send speed to ESP32
+                const endpoint = `${ESP32_IP}/speed?value=${speed}`;
+                const response = await fetch(endpoint);
+                
+                if (!response.ok) {
+                    alert("Failed to update motor speed");
+                }
+            } catch (error) {
+                alert('Error connecting to ESP32');
+                console.error(error);
+            }
+        }
+    </script>
+
+</body>
+</html>
